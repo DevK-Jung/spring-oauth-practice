@@ -1,10 +1,80 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="KO">
-<head><title>Login</title></head>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Login</title>
+	<style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f8;
+        }
+
+        .login-container {
+            max-width: 360px;
+            margin: 100px auto;
+            padding: 40px 30px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .login-container h2 {
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .social-btn {
+            margin: 12px 0;
+            display: inline-block;
+            transition: transform 0.2s ease;
+        }
+
+        .social-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .social-btn img {
+            width: 260px;
+            height: 45px;
+            object-fit: contain;
+            border-radius: 4px;
+            background: white;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #888;
+            font-size: 13px;
+        }
+	</style>
+</head>
 <body>
-<h2>Social Login</h2>
-<a href="/oauth2/authorization/google">Login with Google</a><br/>
-<a href="/oauth2/authorization/naver">Login with Naver</a><br/>
-<a href="/oauth2/authorization/kakao">Login with Kakao</a>
+<div class="login-container">
+	<h2>Sign in</h2>
+
+	<!-- Google 로그인 버튼 -->
+	<a href="/oauth2/authorization/google" class="social-btn">
+		<img src="/img/google_login.svg" alt="Sign in with Google">
+	</a>
+
+	<!-- Naver 로그인 버튼 (네모형) -->
+	<a href="/oauth2/authorization/naver" class="social-btn">
+		<img src="/img/naver_login.png" alt="Log in with Naver">
+	</a>
+
+	<!-- Kakao 로그인 버튼 -->
+	<a href="/oauth2/authorization/kakao" class="social-btn">
+		<img src="/img/kakao_login.png" alt="Login with Kakao">
+	</a>
+</div>
+
+<footer>
+	&copy; 2025 My OAuth Practice
+</footer>
 </body>
 </html>
