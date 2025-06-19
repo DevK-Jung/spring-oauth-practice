@@ -1,11 +1,36 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="KO">
-<head><title>Home</title></head>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Welcome</title>
+	<style>
+        .profile {
+            margin-top: 100px;
+            text-align: center;
+        }
+
+        .profile img {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+
+        .profile h2 {
+            margin: 0;
+        }
+
+        .profile p {
+            color: #555;
+        }
+	</style>
+</head>
 <body>
-<h2>Welcome!</h2>
-<p th:text="'User: ' + ${#authentication.name}"></p>
-<form th:action="@{/logout}" method="post">
-	<button type="submit">Logout</button>
-</form>
+<div class="profile">
+	<img th:src="${picture}" alt="Profile Image"/>
+	<h2 th:text="${name}">User Name</h2>
+	<p th:text="${email}">user@example.com</p>
+</div>
 </body>
 </html>
