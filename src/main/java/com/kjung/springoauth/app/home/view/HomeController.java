@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
 
     @GetMapping("/")
-    public String index(@AuthenticationPrincipal OAuth2User oAuth2User, Model model) {
-        if (oAuth2User != null) {
+    public String index(@AuthenticationPrincipal OAuth2User oAuth2User, Model model) {if (oAuth2User != null) {
             model.addAttribute("name", oAuth2User.getAttribute("name"));
             model.addAttribute("email", oAuth2User.getAttribute("email"));
             model.addAttribute("picture", oAuth2User.getAttribute("picture")); // 구글만 해당
