@@ -34,7 +34,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private Map<String, Object> parseAttributes(String registrationId, Map<String, Object> attributes) {
         if ("naver".equals(registrationId)) {
-            return (Map<String, Object>) attributes.get("response");
+            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("email", response.get("email"));
+            result.put("picture", response.get("profile_image"));
+            result.put("id", response.get("id"));
+            result.put("name", response.get("name"));
+
+            return result;
         } else if ("kakao".equals(registrationId)) {
             Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
             Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
