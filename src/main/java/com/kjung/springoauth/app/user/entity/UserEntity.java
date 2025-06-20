@@ -1,11 +1,10 @@
 package com.kjung.springoauth.app.user.entity;
 
+import com.kjung.springoauth.app.account.dto.SignUpReqDto;
 import com.kjung.springoauth.app.role.entity.RoleEntity;
-import com.kjung.springoauth.core.security.oAuth.constants.OAuthRegisterType;
+import com.kjung.springoauth.core.security.oAuth.vo.OAuthUser;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Comment;
 
 @Entity
@@ -16,6 +15,8 @@ import org.hibernate.annotations.Comment;
                 @UniqueConstraint(name = "uk_provider_providerId", columnNames = {"provider", "provider_id"})
         }
 )
+@Builder(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserEntity {
     @Id
@@ -25,8 +26,12 @@ public class UserEntity {
     private Long seq;
 
     @Column(length = 50, nullable = false)
-    @Comment("사용자 이름 또는 닉네임")
+    @Comment("사용자 명")
     private String username;
+
+    @Column(length = 50, nullable = false)
+    @Comment("닉네임")
+    private String nickname;
 
     @Column(length = 100, nullable = false, unique = true)
     @Comment("이메일")
@@ -36,10 +41,9 @@ public class UserEntity {
     @Comment("나이")
     private Integer age;
 
-    @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
     @Comment("OAuth 제공자 (google, naver, kakao)")
-    private OAuthRegisterType provider;
+    private String provider;
 
     @Column(length = 100, nullable = false)
     @Comment("OAuth 제공자의 고유 식별자 (sub, id 등)")
@@ -49,4 +53,19 @@ public class UserEntity {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "role_seq", foreignKey = @ForeignKey(name = "fk_user_role"))
     private RoleEntity role;
+
+    public static UserEntity create(OAuthUser oauthUser,
+                                    SignUpReqDto signUpDto,
+                                    RoleEntity role) {
+        return UserEntity.builder()
+                .username(oauthUser.getName())
+                .email(oauthUser.getEmail())
+                .nickname(signUpDto.getNickname())
+                .age(signUpDto.getAge())
+                .provider(oauthUser.getRegisterId())
+                .providerId(oauthUser.getId())
+                .role(role)
+                .build();
+    }
+
 }

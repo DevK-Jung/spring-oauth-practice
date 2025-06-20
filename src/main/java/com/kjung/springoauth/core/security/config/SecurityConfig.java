@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -23,6 +24,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/login",
+                                "/signup",
                                 "/css/**",
                                 "/js/**",
                                 "/img/**",
@@ -31,8 +33,18 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login")
+                       .loginPage("/login")
                         .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+                        .failureHandler(((request, response, exception) -> {
+                            if (exception instanceof OAuth2AuthenticationException auth) {
+                                if (auth.getError().getErrorCode().equals("need_register")) {
+                                    response.sendRedirect("/signup"); // 추가 정보 입력 페이지로 이동
+                                    return;
+                                }
+                            }
+
+                            response.sendRedirect("/login?error");
+                        }))
                 )
                 .logout(logout -> logout.logoutSuccessUrl("/"));
 
