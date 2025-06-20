@@ -19,7 +19,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
+
+import static com.kjung.springoauth.core.constants.SessionKey.TMP_SESSION;
 
 @Service
 @RequiredArgsConstructor
@@ -34,28 +35,40 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId(); // google/naver/kakao
+
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        // provider별 사용자 정보 파싱 로직 구현 필요
-        OAuthUser oAuthUser = attributesParser.parse(registrationId, attributes);
+        // provider별 사용자 정보 파싱
+        OAuthUser parsedUser = attributesParser.parse(registrationId, attributes);
 
-        Optional<UserEntity> user
-                = userRepository.findByProviderAndProviderId(oAuthUser.getRegisterId(), oAuthUser.getId());
+        return userRepository.findByProviderAndProviderId(parsedUser.getRegisterId(), parsedUser.getId())
+                .map(user -> createAuthenticatedUser(parsedUser, attributes, user))
+                .orElseGet(() -> handleUnregisteredUser(parsedUser));
+    }
 
-        if (user.isPresent()) {
+    private OAuth2User createAuthenticatedUser(OAuthUser parsedUser,
+                                               Map<String, Object> attributes,
+                                               UserEntity userEntity) {
+        return CustomOAuth2User.create(
+                parsedUser,
+                attributes,
+                Collections.singleton(new SimpleGrantedAuthority(userEntity.getRole().getRoleCode()))
+        );
+    }
 
-            return CustomOAuth2User.create(
-                    oAuthUser,
-                    attributes,
-                    Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
-            );
-        } else {
-            // 아직 회원가입되지 않은 사용자 → 세션에 정보 저장 후 redirect
-            HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-                    .getRequest().getSession();
+    private OAuth2User handleUnregisteredUser(OAuthUser parsedUser) {
+        HttpSession session = getCurrentHttpSession();
+        session.setAttribute(TMP_SESSION.name(), parsedUser);
 
-            session.setAttribute("oauthUser", oAuthUser);
-            throw new OAuth2AuthenticationException(new OAuth2Error("need_register"), "추가 정보 필요");
-        }
+        throw new OAuth2AuthenticationException(
+                new OAuth2Error("need_register"),
+                "추가 정보 필요"
+        );
+    }
+
+    private HttpSession getCurrentHttpSession() {
+        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                .getRequest()
+                .getSession();
     }
 }

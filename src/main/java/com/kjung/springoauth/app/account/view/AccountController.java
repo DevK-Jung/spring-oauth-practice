@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Collections;
+
+import static com.kjung.springoauth.core.constants.SessionKey.TMP_SESSION;
 
 @Controller
 @RequiredArgsConstructor
@@ -46,7 +49,7 @@ public class AccountController {
     @PostMapping
     public String completeSignup(@ModelAttribute SignUpReqDto param,
                                  HttpSession session) {
-        OAuthUser oauthUser = (OAuthUser) session.getAttribute("oauthUser");
+        OAuthUser oauthUser = (OAuthUser) session.getAttribute(TMP_SESSION.name());
 
         if (oauthUser == null) return "redirect:/login";
 
@@ -56,12 +59,16 @@ public class AccountController {
         // 회원가입 처리
         userRepository.save(UserEntity.create(oauthUser, param, defaultAuth));
 
-        session.removeAttribute("oauthUser");
+        session.removeAttribute(TMP_SESSION.name());
 
         CustomOAuth2User authenticatedUser = CustomOAuth2User.create(oauthUser, null, Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
 
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(authenticatedUser, null, authenticatedUser.getAuthorities());
+        // OAuth2AuthenticationToken 사용
+        OAuth2AuthenticationToken authToken = new OAuth2AuthenticationToken(
+                authenticatedUser,
+                authenticatedUser.getAuthorities(),
+                oauthUser.getRegisterId() // registrationId ("google", "naver" 등)
+        );
 
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
