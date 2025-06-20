@@ -1,5 +1,7 @@
 package com.kjung.springoauth.core.security.oAuth;
 
+import com.kjung.springoauth.core.security.oAuth.parser.OAuthAttributesParserComposite;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -9,11 +11,13 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+
+    private final OAuthAttributesParserComposite attributesParser;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -23,35 +27,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
         // provider별 사용자 정보 파싱 로직 구현 필요
-        Map<String, Object> parsedAttributes = parseAttributes(registrationId, attributes);
+        Map<String, Object> parsedAttributes = attributesParser.parse(registrationId, attributes);
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
                 parsedAttributes,
                 "name" // 사용자명 필드명
         );
-    }
-
-    private Map<String, Object> parseAttributes(String registrationId, Map<String, Object> attributes) {
-        if ("naver".equals(registrationId)) {
-            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-
-            Map<String, Object> result = new HashMap<>();
-            result.put("email", response.get("email"));
-            result.put("picture", response.get("profile_image"));
-            result.put("id", response.get("id"));
-            result.put("name", response.get("name"));
-
-            return result;
-        } else if ("kakao".equals(registrationId)) {
-            Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-            Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-            Map<String, Object> result = new HashMap<>();
-            result.put("id", attributes.get("id"));
-            result.put("picture", profile.get("profile_image_url"));
-            result.put("name", profile.get("nickname"));
-            return result;
-        }
-        return attributes; // google
     }
 }
