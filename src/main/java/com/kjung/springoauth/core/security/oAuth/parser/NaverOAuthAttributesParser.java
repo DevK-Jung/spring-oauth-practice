@@ -1,9 +1,12 @@
 package com.kjung.springoauth.core.security.oAuth.parser;
 
 import com.kjung.springoauth.core.security.oAuth.constants.OAuthRegisterType;
+import com.kjung.springoauth.core.security.oAuth.vo.OAuthUser;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+
+import static com.kjung.springoauth.core.util.StringUtilsEx.toStringOrNull;
 
 @Component
 public class NaverOAuthAttributesParser implements OAuthAttributesParser {
@@ -13,13 +16,18 @@ public class NaverOAuthAttributesParser implements OAuthAttributesParser {
     }
 
     @Override
-    public Map<String, Object> parse(Map<String, Object> attributes) {
-        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-        return Map.of(
-                "email", response.get("email"),
-                "picture", response.get("profile_image"),
-                "id", response.get("id"),
-                "name", response.get("name")
-        );
+    public OAuthUser parse(Map<String, Object> attributes) {
+        Object response = attributes.get("response");
+
+        if (!(response instanceof Map<?, ?> responseMap))
+            throw new RuntimeException("Invalid naver_response format");
+
+        return OAuthUser.builder()
+                .registerId(OAuthRegisterType.NAVER.getRegisterId())
+                .id(toStringOrNull(responseMap.get("id")))
+                .picture(toStringOrNull(responseMap.get("profile_image")))
+                .name(toStringOrNull(responseMap.get("name")))
+                .email(toStringOrNull(responseMap.get("email")))
+                .build();
     }
 }

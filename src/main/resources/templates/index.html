@@ -101,9 +101,9 @@
 	</div>
 
 	<div class="profile">
-		<img th:src="${picture}" alt="Profile Image"/>
-		<h2 th:text="${name}">User Name</h2>
-		<p th:text="${email}">user@example.com</p>
+		<img th:src="${userInfo?.picture}" alt="Profile Image"/>
+		<h2 th:text="${userInfo?.name}">User Name</h2>
+		<p th:text="${userInfo?.email}">user@example.com</p>
 	</div>
 </div>
 </body>
