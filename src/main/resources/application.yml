@@ -5,7 +5,7 @@ spring:
   application:
     name: spring-oauth
   datasource:
-    url: jdbc:mysql://oauth-mysql:33064?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowMultiQueries=true
+    url: jdbc:mysql://localhost:33064/spring_oauth?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowMultiQueries=true
     username: "root"
     password: "root1234"
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -20,7 +20,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create       # create, create-drop, update, validate, none
+      ddl-auto: create-drop       # create, create-drop, update, validate, none
     show-sql: false
     properties:
       hibernate:
