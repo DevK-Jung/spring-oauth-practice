@@ -33,7 +33,7 @@ public class UserEntity {
     @Comment("닉네임")
     private String nickname;
 
-    @Column(length = 100, nullable = false, unique = true)
+    @Column(length = 100, unique = true)
     @Comment("이메일")
     private String email;
 

@@ -24,6 +24,7 @@ public class GoogleOAuthAttributesParser implements OAuthAttributesParser {
                 .picture(StringUtilsEx.toStringOrNull(attributes.get("picture")))
                 .name(StringUtilsEx.toStringOrNull(attributes.get("name")))
                 .email(StringUtilsEx.toStringOrNull(attributes.get("email")))
+                .attributes(attributes)
                 .build();
     }
 }

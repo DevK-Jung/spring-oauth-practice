@@ -32,6 +32,7 @@ public class KakaoOAuthAttributesParser implements OAuthAttributesParser {
                 .id(toStringOrNull(attributes.get("id")))
                 .picture(toStringOrNull(profileMap.get("profile_image_url")))
                 .name(toStringOrNull(profileMap.get("nickname")))
+                .attributes(attributes)
                 .build();
     }
 

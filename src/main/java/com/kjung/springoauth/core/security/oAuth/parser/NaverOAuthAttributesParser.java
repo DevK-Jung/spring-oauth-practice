@@ -28,6 +28,7 @@ public class NaverOAuthAttributesParser implements OAuthAttributesParser {
                 .picture(toStringOrNull(responseMap.get("profile_image")))
                 .name(toStringOrNull(responseMap.get("name")))
                 .email(toStringOrNull(responseMap.get("email")))
+                .attributes(attributes)
                 .build();
     }
 }

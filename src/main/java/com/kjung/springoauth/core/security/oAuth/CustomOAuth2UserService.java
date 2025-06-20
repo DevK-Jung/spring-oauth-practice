@@ -2,6 +2,7 @@ package com.kjung.springoauth.core.security.oAuth;
 
 import com.kjung.springoauth.app.user.entity.UserEntity;
 import com.kjung.springoauth.app.user.repository.UserRepository;
+import com.kjung.springoauth.core.error.constants.ErrorCode;
 import com.kjung.springoauth.core.security.oAuth.parser.OAuthAttributesParserComposite;
 import com.kjung.springoauth.core.security.oAuth.vo.CustomOAuth2User;
 import com.kjung.springoauth.core.security.oAuth.vo.OAuthUser;
@@ -61,7 +62,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         session.setAttribute(TMP_SESSION.name(), parsedUser);
 
         throw new OAuth2AuthenticationException(
-                new OAuth2Error("need_register"),
+                new OAuth2Error(ErrorCode.NEED_REGISTER.name()),
                 "추가 정보 필요"
         );
     }
